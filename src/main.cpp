@@ -4,11 +4,6 @@
 #include "primitives//myWindow.h"
 #include "primitives/Model.h"
 
-// timing
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
-
-
 int main() {
 
     glfwInit();
@@ -43,6 +38,9 @@ int main() {
     glfwSetInputMode(myWindow.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     /* shaders and models */
+    Shader testShader("../shaders/test_vert.glsl", "../shaders/test_frag.glsl");
+    stbi_set_flip_vertically_on_load(true);
+    Model testModel("../resources/models/backpack/backpack.obj");
 
     // main window loop
     while(!glfwWindowShouldClose(myWindow.window))
@@ -62,6 +60,16 @@ int main() {
         /* eg. myWindow.GetPerspectiveMatrix
         *  eg. myWindow.GetViewMatrix        */
 
+        glm::mat4 projection = glm::perspective(glm::radians(myWindow.flyCamera->Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 view = myWindow.flyCamera->GetViewMatrix();
+        auto model = glm::mat4(1.0f);
+
+        testShader.use();
+        testShader.setMat4("projection", projection);
+        testShader.setMat4("view", view);
+        testShader.setMat4("model", model);
+
+        testModel.Draw(testShader);
 
         // check and call events, swap buffers
         glfwSwapBuffers(myWindow.window);

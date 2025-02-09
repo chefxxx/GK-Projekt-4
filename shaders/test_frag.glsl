@@ -1,7 +1,13 @@
 #version 330 core
 out vec4 FragColor;
 
+uniform sampler2D texture_diffuse1;
+
+in vec2 TexCoords;
+in vec3 Normal;
+in vec3 FragPos;
+
 void main()
 {
-    FragColor = vec4(1.0); // set all 4 vector values to 1.0
+    FragColor = texture(texture_diffuse1, TexCoords);
 }
