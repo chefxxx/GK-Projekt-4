@@ -2,6 +2,12 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "primitives//myWindow.h"
+#include "primitives/Model.h"
+
+// timing
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
 
 int main() {
 
@@ -32,11 +38,18 @@ int main() {
         return -1;
     }
 
-    //TODO
-    /* register shaders */
+    /* gl variable setting */
+    glEnable(GL_DEPTH_TEST);
+    glfwSetInputMode(myWindow.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+    /* shaders and models */
+
+    // main window loop
     while(!glfwWindowShouldClose(myWindow.window))
     {
+        // pre frame time logic
+        myWindow.calculateFrameTime();
+
         // input
         myWindow.ProcessInput();
 
@@ -44,6 +57,11 @@ int main() {
         // ...
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        //TODO: here will be functions that return matrices depending on a camera
+        /* eg. myWindow.GetPerspectiveMatrix
+        *  eg. myWindow.GetViewMatrix        */
+
 
         // check and call events, swap buffers
         glfwSwapBuffers(myWindow.window);
