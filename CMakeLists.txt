@@ -17,5 +17,7 @@ set (PROJECT_SRC
         src/main.cpp
 )
 
-add_executable(gk_final_0 src/main.cpp)
+add_executable(gk_final_0 src/main.cpp
+        src/primitives/myWindow.cpp
+        src/primitives/myWindow.h)
 target_link_libraries(gk_final_0 ${OPENGL_LIBRARIES} glfw glad assimp::assimp)
