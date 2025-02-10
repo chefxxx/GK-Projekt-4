@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include "primitives//myWindow.h"
 #include "primitives/Model.h"
+#include "primitives/LightSource.h"
 
 int main() {
 
@@ -38,6 +39,7 @@ int main() {
 
     /* shaders, matrices and models */
     Shader testShader("../shaders/test_vert.glsl", "../shaders/test_frag.glsl");
+    Shader lightShader("../shaders/light_vert.glsl", "../shaders/light_frag.glsl");
 
     /* forest model */
     auto fModel = glm::mat4(1.0f);
@@ -79,6 +81,10 @@ int main() {
     sokModelMtx = glm::scale(sokModelMtx, glm::vec3(1.5f,1.5f,1.5f));
     Model sokModel("../resources/models/potrait_of_philosopher_sokrates/scene.gltf", sokModelMtx);
 
+
+    /* lights */
+    LightSource l1(glm::vec3(10.0, 5.0, 10.0), glm::vec3(1.0, 1.0, 1.0));
+
     // main window loop
     while(!glfwWindowShouldClose(myWindow.window))
     {
@@ -90,26 +96,30 @@ int main() {
 
         // rendering commands here
         // ...
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         /* view and projection matrices */
         glm::mat4 projection = glm::perspective(glm::radians(myWindow.flyCamera->Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = myWindow.flyCamera->GetViewMatrix();
 
-        testShader.use();
+        /* draw lights first */
+        l1.Draw(testShader, view, projection);
+
+        lightShader.use();
+        lightShader.setVec3("lightColor",  glm::vec3(1.0f, 1.0f, 1.0f));
+        lightShader.setVec3("lightPos", l1.Position);
+        lightShader.setVec3("viewPos", myWindow.flyCamera->Position);
+        lightShader.setMat4("projection", projection);
+        lightShader.setMat4("view", view);
 
         /* set forest shader */
-        testShader.setMat4("projection", projection);
-        testShader.setMat4("view", view);
-        testShader.setMat4("model", forestModel.model);
-        forestModel.Draw(testShader);
+        lightShader.setMat4("model", forestModel.model);
+        forestModel.Draw(lightShader);
 
         /* set backpack shader */
-        testShader.setMat4("projection", projection);
-        testShader.setMat4("view", view);
-        testShader.setMat4("model", backpackModel.model);
-        backpackModel.Draw(testShader);
+        lightShader.setMat4("model", backpackModel.model);
+        backpackModel.Draw(lightShader);
 
         /* move bird */
         glm::vec4 tmpBirdPos = glm::vec4(birdStartPos, 1.0f);
@@ -127,18 +137,16 @@ int main() {
         birdModel.model = birdModelMtx;
 
         /* set bird shader */
-        testShader.setMat4("model", birdModel.model);
-        testShader.setMat4("projection", projection);
-        testShader.setMat4("view", view);
-        birdModel.Draw(testShader);
+        lightShader.setMat4("model", birdModel.model);
+        birdModel.Draw(lightShader);
 
         /* ball */
-        testShader.setMat4("model", ballModel.model);
-        ballModel.Draw(testShader);
+        lightShader.setMat4("model", ballModel.model);
+        ballModel.Draw(lightShader);
 
         /* sokrates */
-        testShader.setMat4("model", sokModel.model);
-        sokModel.Draw(testShader);
+        lightShader.setMat4("model", sokModel.model);
+        sokModel.Draw(lightShader);
 
         // check and call events, swap buffers
         glfwSwapBuffers(myWindow.window);

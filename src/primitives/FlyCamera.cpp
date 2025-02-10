@@ -20,11 +20,20 @@ glm::mat4 FlyCamera::GetViewMatrix()
     if (mode == FLY)
         retMx = glm::lookAt(Position, Position + Front, Up);
     if (mode == STATIC)
-        retMx = glm::lookAt(STATIC_CAMERA_POSITION, STATIC_CAMERA_TARGET, glm::vec3(0.0f, 1.0f, 0.0f));
+    {
+        Position = STATIC_CAMERA_POSITION;
+        retMx = glm::lookAt(Position, STATIC_CAMERA_TARGET, glm::vec3(0.0f, 1.0f, 0.0f));
+    }
     if (mode == STATIC_FOLLOW)
-        retMx = glm::lookAt(STATIC_CAMERA_POSITION, followTarget, glm::vec3(0.0f, 1.0f, 0.0f));
+    {
+        Position = STATIC_CAMERA_POSITION;
+        retMx = glm::lookAt(Position, followTarget, glm::vec3(0.0f, 1.0f, 0.0f));
+    }
     if (mode == OBJECT)
-        retMx = glm::lookAt(followCamPos, followTarget, glm::vec3(0.0f, 1.0f, 0.0f));
+    {
+        Position = followCamPos;
+        retMx = glm::lookAt(Position, followTarget, glm::vec3(0.0f, 1.0f, 0.0f));
+    }
     return retMx;
 }
 
