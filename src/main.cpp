@@ -39,7 +39,7 @@ int main() {
 
     /* shaders, matrices and models */
     Shader testShader("../shaders/test_vert.glsl", "../shaders/test_frag.glsl");
-    Shader lightShader("../shaders/light_vert.glsl", "../shaders/light_frag.glsl");
+    Shader lightShader("../shaders/test2_vert.glsl", "../shaders/test2_frag.glsl");
 
     /* forest model */
     auto fModel = glm::mat4(1.0f);
@@ -58,19 +58,20 @@ int main() {
     stbi_set_flip_vertically_on_load(false);
     auto birdModelMtx = glm::mat4(1.0f);
     auto birdStartPos = glm::vec3(12.0f, 5.0f, 0.0f);
+    birdModelMtx = glm::translate(birdModelMtx, birdStartPos);
+    Model birdModel("../resources/models/low_poly_bird/scene.gltf", birdModelMtx);
+
     /* settings for camera following bird */
     auto cameraPos = glm::vec4(12.0f, 8.0f, 0.0f, 1.0f);
     cameraPos = cameraPos * glm::rotate(glm::mat4(1.0f), glm::radians(-35.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    birdModelMtx = glm::translate(birdModelMtx, birdStartPos);
-    Model birdModel("../resources/models/low_poly_bird/scene.gltf", birdModelMtx);
-
     /* poke_ball */
-    stbi_set_flip_vertically_on_load(true);
+    stbi_set_flip_vertically_on_load(false);
     auto ballModelMtx = glm::mat4(1.0f);
     auto ballStartPos = glm::vec3(-3.0f, 1.0f, 0.0f);
     ballModelMtx = glm::translate(ballModelMtx, ballStartPos);
-    Model ballModel("../resources/models/poke_ball/scene.gltf", ballModelMtx);
+    ballModelMtx = glm::scale(ballModelMtx, glm::vec3(0.5f, 0.5f, 0.5f));
+    Model ballModel("../resources/models/soccer_ball/scene.gltf", ballModelMtx);
 
     /* sokrates */
     stbi_set_flip_vertically_on_load(false);
@@ -81,9 +82,12 @@ int main() {
     sokModelMtx = glm::scale(sokModelMtx, glm::vec3(1.5f,1.5f,1.5f));
     Model sokModel("../resources/models/potrait_of_philosopher_sokrates/scene.gltf", sokModelMtx);
 
-
     /* lights */
-    LightSource l1(glm::vec3(10.0, 5.0, 10.0), glm::vec3(1.0, 1.0, 1.0));
+    LightSource lDir(glm::vec3(0.0f, 20.0f, 0.0f), glm::vec3(1.0f, 1.0f, 0.0f));
+    LightSource lPoint1(glm::vec3(10.0, 5.0, 10.0), glm::vec3(1.0, 1.0, 1.0));
+    LightSource lPoint2(glm::vec3(-10.0, 5.0, -10.0), glm::vec3(1.0, 1.0, 1.0));
+    LightSource lSpotlight(birdStartPos, glm::vec3(1.0, 1.0, 0.0));
+    lSpotlight.setDirAndCutoff();
 
     // main window loop
     while(!glfwWindowShouldClose(myWindow.window))
@@ -104,24 +108,34 @@ int main() {
         glm::mat4 view = myWindow.flyCamera->GetViewMatrix();
 
         /* draw lights first */
-        l1.Draw(testShader, view, projection);
+        lPoint1.Draw(testShader, view, projection);
+        lPoint2.Draw(testShader, view, projection);
+        lDir.Draw(testShader, view, projection);
+        lSpotlight.Draw(testShader, view, projection);
+
 
         lightShader.use();
         lightShader.setVec3("lightColor",  glm::vec3(1.0f, 1.0f, 1.0f));
-        lightShader.setVec3("lightPos", l1.Position);
+        lightShader.setVec3("lightPos", lPoint1.Position);
         lightShader.setVec3("viewPos", myWindow.flyCamera->Position);
         lightShader.setMat4("projection", projection);
         lightShader.setMat4("view", view);
+        lightShader.setFloat("lightConstant", lPoint1.constant);
+        lightShader.setFloat("lightLinear", lPoint1.linear);
+        lightShader.setFloat("lightQuadratic", lPoint1.quadratic);
 
         /* set forest shader */
+        lightShader.setMat3("normalTrans", glm::mat3(glm::transpose(glm::inverse(forestModel.model))));
         lightShader.setMat4("model", forestModel.model);
         forestModel.Draw(lightShader);
 
         /* set backpack shader */
+        lightShader.setMat3("normalTrans", glm::mat3(glm::transpose(glm::inverse(backpackModel.model))));
         lightShader.setMat4("model", backpackModel.model);
         backpackModel.Draw(lightShader);
 
         /* move bird */
+        // TODO: bird normals are wrongly translated!!!
         glm::vec4 tmpBirdPos = glm::vec4(birdStartPos, 1.0f);
         tmpBirdPos = tmpBirdPos * glm::rotate(glm::mat4(1.0f), (float)glfwGetTime() * 0.2f, glm::vec3(0.0f, 1.0f, 0.0f));
         glm::vec4 tmpCameraPos = cameraPos * glm::rotate(glm::mat4(1.0f), (float)glfwGetTime() * 0.2f, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -134,17 +148,21 @@ int main() {
         birdModelMtx = glm::translate(birdModelMtx, glm::vec3(tmpBirdPos.x, tmpBirdPos.y, tmpBirdPos.z));
         birdModelMtx = glm::rotate(birdModelMtx, (float)glfwGetTime() * -0.2f, glm::vec3(0.0f, 1.0f, 0.0f));
         birdModelMtx = glm::scale(birdModelMtx, glm::vec3(0.2f, 0.2f, 0.2f));
+
         birdModel.model = birdModelMtx;
 
         /* set bird shader */
+        lightShader.setMat3("normalTrans", glm::mat3(glm::transpose(glm::inverse(birdModel.model))));
         lightShader.setMat4("model", birdModel.model);
         birdModel.Draw(lightShader);
 
         /* ball */
+        lightShader.setMat3("normalTrans", glm::mat3(glm::transpose(glm::inverse(ballModel.model))));
         lightShader.setMat4("model", ballModel.model);
         ballModel.Draw(lightShader);
 
         /* sokrates */
+        lightShader.setMat3("normalTrans", glm::mat3(glm::transpose(glm::inverse(sokModel.model))));
         lightShader.setMat4("model", sokModel.model);
         sokModel.Draw(lightShader);
 

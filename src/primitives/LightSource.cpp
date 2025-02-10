@@ -4,10 +4,26 @@
 
 #include "LightSource.h"
 
-LightSource::LightSource(glm::vec3 pos, glm::vec3 col)
+
+void LightSource::Draw(Shader shader, glm::mat4 view, glm::mat4 projection)
 {
+    shader.use();
+    shader.setMat4("view", view);
+    shader.setMat4("projection", projection);
+    auto model = glm::mat4(1.0f);
+    model = glm::translate(model, Position);
+    model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
+    shader.setMat4("model", model);
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+}
+
+LightSource::LightSource(glm::vec3 pos, glm::vec3 col, float cnst, float lin, float quad) {
     Position = pos;
     Color = col;
+    constant = cnst;
+    linear = lin;
+    quadratic = quad;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
 
@@ -20,15 +36,8 @@ LightSource::LightSource(glm::vec3 pos, glm::vec3 col)
     glEnableVertexAttribArray(0);
 }
 
-void LightSource::Draw(Shader shader, glm::mat4 view, glm::mat4 projection)
+void LightSource::setDirAndCutoff(glm::vec3 dir, float value)
 {
-    shader.use();
-    shader.setMat4("view", view);
-    shader.setMat4("projection", projection);
-    auto model = glm::mat4(1.0f);
-    model = glm::translate(model, Position);
-    model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));w
-    shader.setMat4("model", model);
-    glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    direction = dir;
+    cutoff = value;
 }

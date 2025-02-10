@@ -89,6 +89,12 @@ void Shader::setVec3(const std::string &name, glm::vec3 value) const
     glUniform3f(locID, value.x, value.y, value.z);
 }
 
+void Shader::setMat3(const std::string &name, glm::mat3 value) const
+{
+    int locID = glGetUniformLocation(ID, name.c_str());
+    glUniformMatrix3fv(locID, 1, GL_FALSE, glm::value_ptr(value));
+}
+
 void Shader::checkCompileErrors(unsigned int shader, std::string type)
 {
     int success;
@@ -112,3 +118,4 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type)
         }
     }
 }
+
