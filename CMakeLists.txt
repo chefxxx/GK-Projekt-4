@@ -25,5 +25,6 @@ add_executable(gk_final_0 src/main.cpp
         src/primitives/Mesh.h
         dependencies/stb_image.cpp
         src/primitives/Shader.cpp
-        src/primitives/Model.cpp)
+        src/primitives/Model.cpp
+        src/primitives/FlyCamera.cpp)
 target_link_libraries(gk_final_0 ${OPENGL_LIBRARIES} glfw glad assimp::assimp)

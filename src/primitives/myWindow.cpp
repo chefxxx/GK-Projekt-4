@@ -7,7 +7,7 @@
 myWindow::myWindow(const char *title)
 {
     window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, title, nullptr, nullptr);
-    flyCamera = new FlyCamera(glm::vec3(0.0f, 0.0f, 3.0f));
+    flyCamera = new FlyCamera(STATIC_CAMERA_POSITION);
 }
 
 void myWindow::RegisterCallbacks()
@@ -47,6 +47,27 @@ void myWindow::ProcessInput()
         flyCamera->ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         flyCamera->ProcessKeyboard(RIGHT, deltaTime);
+
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+    {
+        flyCamera->mode = FLY;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    }
+    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+    {
+        flyCamera->mode = STATIC;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
+    if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+    {
+        flyCamera->mode = STATIC_FOLLOW;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
+    if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+    {
+        flyCamera->mode = OBJECT;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
 }
 
 void myWindow::framebuffer_size_callback(GLFWwindow *window, int width, int height)
@@ -72,7 +93,8 @@ void myWindow::mouse_callback(GLFWwindow *window, double xposIn, double yposIn)
     lastX = xpos;
     lastY = ypos;
 
-    flyCamera->ProcessMouseMovement(xoffset, yoffset);
+    if (flyCamera->mode == FLY)
+        flyCamera->ProcessMouseMovement(xoffset, yoffset);
 }
 
 void myWindow::scroll_callback(GLFWwindow *window, double xoffset, double yoffset)

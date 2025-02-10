@@ -56,12 +56,12 @@ int main() {
     /* bird */
     stbi_set_flip_vertically_on_load(false);
     auto birdModelMtx = glm::mat4(1.0f);
-    auto birdStartPos = glm::vec3(12.0f, 8.0f, 0.0f);
+    auto birdStartPos = glm::vec3(12.0f, 5.0f, 0.0f);
     birdModelMtx = glm::translate(birdModelMtx, birdStartPos);
     birdModelMtx = glm::scale(birdModelMtx, glm::vec3(0.1f, 0.1f, 0.1f));
     Model birdModel("../resources/models/low_poly_bird/scene.gltf", birdModelMtx);
 
-    /* fire */
+    /* poke_ball */
     stbi_set_flip_vertically_on_load(true);
     auto ballModelMtx = glm::mat4(1.0f);
     auto ballStartPos = glm::vec3(-3.0f, 1.0f, 0.0f);
@@ -69,11 +69,11 @@ int main() {
     Model ballModel("../resources/models/poke_ball/scene.gltf", ballModelMtx);
 
     /* sokrates */
+    stbi_set_flip_vertically_on_load(false);
     auto sokModelMtx = glm::mat4(1.0f);
-    auto sokStartPos = glm::vec3(3.0f, 1.0f, 3.0f);
+    auto sokStartPos = glm::vec3(3.0f, 1.0f, 0.0f);
     sokModelMtx = glm::translate(sokModelMtx, sokStartPos);
     sokModelMtx = glm::rotate(sokModelMtx, glm::radians(-90.0f), glm::vec3(1.0f,0.0f,0.0f));
-    sokModelMtx = glm::rotate(sokModelMtx, glm::radians(180.0f), glm::vec3(0.0f,0.0f,1.0f));
     sokModelMtx = glm::scale(sokModelMtx, glm::vec3(1.5f,1.5f,1.5f));
     Model sokModel("../resources/models/potrait_of_philosopher_sokrates/scene.gltf", sokModelMtx);
 
@@ -114,6 +114,8 @@ int main() {
         /* move bird */
         glm::vec4 tmpBirdPos = glm::vec4(birdStartPos, 1.0f);
         tmpBirdPos = tmpBirdPos * glm::rotate(glm::mat4(1.0f), (float)glfwGetTime() * 0.2f, glm::vec3(0.0f, 1.0f, 0.0f));
+        /* set for follow camera */
+        myWindow.flyCamera->followTarget = glm::vec3(tmpBirdPos.x, tmpBirdPos.y, tmpBirdPos.z);
 
         birdModelMtx = glm::mat4(1.0f);
         birdModelMtx = glm::translate(birdModelMtx, glm::vec3(tmpBirdPos.x, tmpBirdPos.y, tmpBirdPos.z));

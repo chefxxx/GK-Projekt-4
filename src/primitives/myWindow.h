@@ -13,11 +13,6 @@
 const unsigned int SCR_WIDTH = 1200;
 const unsigned int SCR_HEIGHT = 1000;
 
-enum CameraType
-{
-    FLY = 0
-};
-
 class myWindow {
 public:
     /* constructor */
