@@ -1,0 +1,8 @@
+Model Information:
+* title:	low poly forest 4
+* source:	https://sketchfab.com/3d-models/low-poly-forest-4-e7114cfd53a341459db4e66fd6a280c8
+* author:	Digital screen official (https://sketchfab.com/ck212575)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works

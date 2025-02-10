@@ -3,9 +3,10 @@
 //
 #include "Model.h"
 
-Model::Model(string const &path, bool gamma) : gammaCorrection(gamma)
+Model::Model(string const &path, glm::mat4 model, bool gamma) : gammaCorrection(gamma)
 {
     Model::loadModel(path);
+    this->model = model;
 }
 
 void Model::Draw(Shader &shader)

@@ -1,0 +1,11 @@
+Model Information:
+* title:	Potrait of philosopher Sokrates
+* source:	https://sketchfab.com/3d-models/potrait-of-philosopher-sokrates-8bd5edeaa32943fba175504ea666bf69
+* author:	Bonn Center for Digital Humanities (https://sketchfab.com/bcdh)
+
+Model License:
+* license type:	CC-BY-NC-ND-4.0 (http://creativecommons.org/licenses/by-nc-nd/4.0/)
+* requirements:	Author must be credited. No commercial use. Modified versions can not be distributed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Potrait of philosopher Sokrates" (https://sketchfab.com/3d-models/potrait-of-philosopher-sokrates-8bd5edeaa32943fba175504ea666bf69) by Bonn Center for Digital Humanities (https://sketchfab.com/bcdh) licensed under CC-BY-NC-ND-4.0 (http://creativecommons.org/licenses/by-nc-nd/4.0/)

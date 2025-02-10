@@ -37,10 +37,45 @@ int main() {
     glEnable(GL_DEPTH_TEST);
     glfwSetInputMode(myWindow.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    /* shaders and models */
+    /* shaders, matrices and models */
     Shader testShader("../shaders/test_vert.glsl", "../shaders/test_frag.glsl");
+
+    /* forest model */
+    auto fModel = glm::mat4(1.0f);
+    fModel = glm::rotate(fModel, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    fModel = glm::scale(fModel, glm::vec3(1.2f, 1.2f, 0.7f));
+    Model forestModel("../resources/models/low_poly_forest_4/scene.gltf", fModel);
+
+    /* backpack */
     stbi_set_flip_vertically_on_load(true);
-    Model testModel("../resources/models/backpack/backpack.obj");
+    auto bModel = glm::mat4(1.0f);
+    bModel = glm::translate(bModel, glm::vec3(0.0f, 1.0f, 0.0f));
+    bModel = glm::scale(bModel, glm::vec3(0.25f, 0.25f, 0.25f));
+    Model backpackModel("../resources/models/backpack/backpack.obj", bModel);
+
+    /* bird */
+    stbi_set_flip_vertically_on_load(false);
+    auto birdModelMtx = glm::mat4(1.0f);
+    auto birdStartPos = glm::vec3(12.0f, 8.0f, 0.0f);
+    birdModelMtx = glm::translate(birdModelMtx, birdStartPos);
+    birdModelMtx = glm::scale(birdModelMtx, glm::vec3(0.1f, 0.1f, 0.1f));
+    Model birdModel("../resources/models/low_poly_bird/scene.gltf", birdModelMtx);
+
+    /* fire */
+    stbi_set_flip_vertically_on_load(true);
+    auto ballModelMtx = glm::mat4(1.0f);
+    auto ballStartPos = glm::vec3(-3.0f, 1.0f, 0.0f);
+    ballModelMtx = glm::translate(ballModelMtx, ballStartPos);
+    Model ballModel("../resources/models/poke_ball/scene.gltf", ballModelMtx);
+
+    /* sokrates */
+    auto sokModelMtx = glm::mat4(1.0f);
+    auto sokStartPos = glm::vec3(3.0f, 1.0f, 3.0f);
+    sokModelMtx = glm::translate(sokModelMtx, sokStartPos);
+    sokModelMtx = glm::rotate(sokModelMtx, glm::radians(-90.0f), glm::vec3(1.0f,0.0f,0.0f));
+    sokModelMtx = glm::rotate(sokModelMtx, glm::radians(180.0f), glm::vec3(0.0f,0.0f,1.0f));
+    sokModelMtx = glm::scale(sokModelMtx, glm::vec3(1.5f,1.5f,1.5f));
+    Model sokModel("../resources/models/potrait_of_philosopher_sokrates/scene.gltf", sokModelMtx);
 
     // main window loop
     while(!glfwWindowShouldClose(myWindow.window))
@@ -59,17 +94,46 @@ int main() {
         //TODO: here will be functions that return matrices depending on a camera
         /* eg. myWindow.GetPerspectiveMatrix
         *  eg. myWindow.GetViewMatrix        */
-
         glm::mat4 projection = glm::perspective(glm::radians(myWindow.flyCamera->Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = myWindow.flyCamera->GetViewMatrix();
-        auto model = glm::mat4(1.0f);
 
         testShader.use();
+
+        /* set forest shader */
         testShader.setMat4("projection", projection);
         testShader.setMat4("view", view);
-        testShader.setMat4("model", model);
+        testShader.setMat4("model", forestModel.model);
+        forestModel.Draw(testShader);
 
-        testModel.Draw(testShader);
+        /* set backpack shader */
+        testShader.setMat4("projection", projection);
+        testShader.setMat4("view", view);
+        testShader.setMat4("model", backpackModel.model);
+        backpackModel.Draw(testShader);
+
+        /* move bird */
+        glm::vec4 tmpBirdPos = glm::vec4(birdStartPos, 1.0f);
+        tmpBirdPos = tmpBirdPos * glm::rotate(glm::mat4(1.0f), (float)glfwGetTime() * 0.2f, glm::vec3(0.0f, 1.0f, 0.0f));
+
+        birdModelMtx = glm::mat4(1.0f);
+        birdModelMtx = glm::translate(birdModelMtx, glm::vec3(tmpBirdPos.x, tmpBirdPos.y, tmpBirdPos.z));
+        birdModelMtx = glm::rotate(birdModelMtx, (float)glfwGetTime() * -0.2f, glm::vec3(0.0f, 1.0f, 0.0f));
+        birdModelMtx = glm::scale(birdModelMtx, glm::vec3(0.2f, 0.2f, 0.2f));
+        birdModel.model = birdModelMtx;
+
+        /* set bird shader */
+        testShader.setMat4("model", birdModel.model);
+        testShader.setMat4("projection", projection);
+        testShader.setMat4("view", view);
+        birdModel.Draw(testShader);
+
+        /* ball */
+        testShader.setMat4("model", ballModel.model);
+        ballModel.Draw(testShader);
+
+        /* sokrates */
+        testShader.setMat4("model", sokModel.model);
+        sokModel.Draw(testShader);
 
         // check and call events, swap buffers
         glfwSwapBuffers(myWindow.window);

@@ -20,8 +20,10 @@ enum CameraType
 
 class myWindow {
 public:
+    /* constructor */
     myWindow(const char* title);
 
+    /* basic window functions from tutorial*/
     GLFWwindow* window;
     void RegisterCallbacks();
     void ProcessInput();

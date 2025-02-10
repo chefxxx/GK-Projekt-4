@@ -31,9 +31,11 @@ public:
     string directory;
     bool gammaCorrection;
 
-    Model(string const &path, bool gamma = false);
+    Model(string const &path, glm::mat4 model, bool gamma = false);
     void Draw(Shader &shader);
 
+    /* model variables */
+    glm::mat4 model;
 private:
     void loadModel(string const &path);
     void processNode(aiNode *node, const aiScene *scene);
