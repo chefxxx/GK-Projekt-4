@@ -25,6 +25,7 @@ public:
     void framebuffer_size_callback(GLFWwindow* window, int width, int height);
     void mouse_callback(GLFWwindow* window, double xpos, double ypos);
     void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+    void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
     /* camera variables */
     FlyCamera* flyCamera;
@@ -36,6 +37,9 @@ public:
     void calculateFrameTime();
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
+
+    /* scene variables */
+    bool day = true;
 };
 
 

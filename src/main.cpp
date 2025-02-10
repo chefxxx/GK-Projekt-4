@@ -84,7 +84,12 @@ int main() {
 
     /* point lights */
     LightSource lPoint1(glm::vec3(10.0, 5.0, 10.0), glm::vec3(1.0, 1.0, 1.0));
-    LightSource lPoint2(glm::vec3(-10.0, 5.0, -10.0), glm::vec3(1.0, 1.0, 1.0));
+    lPoint1.setPoints(0.14f, 0.07f);
+
+    LightSource lPoint2(glm::vec3(-8.0, 5.0, -8.0), glm::vec3(1.0, 1.0, 1.0));
+    lPoint2.setPoints(0.07f, 0.017f);
+
+    LightSource lPoint3(glm::vec3(0.0f, 1.0f, 3.0f), glm::vec3(1.0, 1.0, 1.0));
 
     /* spotlight */
     LightSource lSpotlight(birdStartPos, glm::vec3(1.0, 1.0, 0.0));
@@ -115,25 +120,41 @@ int main() {
         /* draw lights first */
         lPoint1.Draw(testShader, view, projection);
         lPoint2.Draw(testShader, view, projection);
-        lDir.Draw(testShader, view, projection);
-        lSpotlight.Draw(testShader, view, projection);
+        lPoint3.Draw(testShader, view, projection);
+//        lDir.Draw(testShader, view, projection);
+//        lSpotlight.Draw(testShader, view, projection);
 
         /* shared variables */
         lightShader.use();
+        lightShader.setBool("day", myWindow.day);
         lightShader.setMat4("view", view);
         lightShader.setVec3("viewPos", myWindow.flyCamera->Position);
         lightShader.setMat4("projection", projection);
 
-//        lightShader.setVec3("lightColor",  glm::vec3(1.0f, 1.0f, 1.0f));
-//        lightShader.setVec3("lightPos", lPoint1.Position);
-
-//        lightShader.setFloat("lightConstant", lPoint1.constant);
-//        lightShader.setFloat("lightLinear", lPoint1.linear);
-//        lightShader.setFloat("lightQuadratic", lPoint1.quadratic);
-
         /* dir light variables */
         lightShader.setVec3("dirLightDir", lDir.direction);
         lightShader.setVec3("dirLightColor", lDir.color);
+
+        /* p1 light variables */
+        lightShader.setVec3("p1Lpos", lPoint1.position);
+        lightShader.setVec3("p1Lcol", lPoint1.color);
+        lightShader.setFloat("p1Lconst", lPoint1.constant);
+        lightShader.setFloat("p1Llinear", lPoint1.linear);
+        lightShader.setFloat("p1Lquadratic", lPoint1.quadratic);
+
+        /* p2 light variables */
+        lightShader.setVec3("p2Lpos", lPoint2.position);
+        lightShader.setVec3("p2Lcol", lPoint2.color);
+        lightShader.setFloat("p2Lconst", lPoint2.constant);
+        lightShader.setFloat("p2Llinear", lPoint2.linear);
+        lightShader.setFloat("p2Lquadratic", lPoint2.quadratic);
+
+        /* p2 light variables */
+        lightShader.setVec3("p3Lpos", lPoint3.position);
+        lightShader.setVec3("p3Lcol", lPoint3.color);
+        lightShader.setFloat("p3Lconst", lPoint3.constant);
+        lightShader.setFloat("p3Llinear", lPoint3.linear);
+        lightShader.setFloat("p3Lquadratic", lPoint3.quadratic);
 
         /* set forest shader */
         lightShader.setMat3("normalTrans", glm::mat3(glm::transpose(glm::inverse(forestModel.model))));

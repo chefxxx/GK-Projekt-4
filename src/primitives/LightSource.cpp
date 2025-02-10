@@ -41,3 +41,9 @@ void LightSource::setDirAndCutoff(glm::vec3 dir, float value)
     direction = dir;
     cutoff = value;
 }
+
+void LightSource::setPoints(float lin, float quad)
+{
+    linear = lin;
+    quadratic = quad;
+}

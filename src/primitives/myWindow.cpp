@@ -32,22 +32,18 @@ void myWindow::RegisterCallbacks()
         static_cast<myWindow*>(glfwGetWindowUserPointer(window))->scroll_callback(window, xoffset, yoffset);
     };
     glfwSetScrollCallback(window, scrollCallback);
+
+    auto keyCallback = [](GLFWwindow* window, int key, int scancode, int action, int mods)
+    {
+        static_cast<myWindow*>(glfwGetWindowUserPointer(window))->key_callback(window, key, scancode, action, mods);
+    };
+    glfwSetKeyCallback(window, keyCallback);
 }
 
-void myWindow::ProcessInput()
+void myWindow::key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        flyCamera->ProcessKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        flyCamera->ProcessKeyboard(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        flyCamera->ProcessKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        flyCamera->ProcessKeyboard(RIGHT, deltaTime);
-
+    if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS)
+        this->day = !this->day;
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
     {
         flyCamera->mode = FLY;
@@ -72,6 +68,22 @@ void myWindow::ProcessInput()
         flyCamera->Zoom = 60;
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
+}
+
+void myWindow::ProcessInput()
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        flyCamera->ProcessKeyboard(FORWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        flyCamera->ProcessKeyboard(BACKWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        flyCamera->ProcessKeyboard(LEFT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        flyCamera->ProcessKeyboard(RIGHT, deltaTime);
+
 }
 
 void myWindow::framebuffer_size_callback(GLFWwindow *window, int width, int height)

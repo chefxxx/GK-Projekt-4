@@ -72,6 +72,7 @@ public:
     void Draw(Shader shader, glm::mat4 view, glm::mat4 projection);
 
     void setDirAndCutoff(glm::vec3 dir = glm::vec3(0.0f, -1.0f, 0.0f), float value = 12.5f);
+    void setPoints(float lin, float quad);
 };
 
 
