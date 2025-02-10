@@ -2,6 +2,7 @@
 // Created by Mateusz Mikiciuk on 10/02/2025.
 //
 #include "FlyCamera.h"
+#include "GLFW/glfw3.h"
 
 FlyCamera::FlyCamera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) : MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
 {
@@ -22,7 +23,8 @@ glm::mat4 FlyCamera::GetViewMatrix()
         retMx = glm::lookAt(STATIC_CAMERA_POSITION, STATIC_CAMERA_TARGET, glm::vec3(0.0f, 1.0f, 0.0f));
     if (mode == STATIC_FOLLOW)
         retMx = glm::lookAt(STATIC_CAMERA_POSITION, followTarget, glm::vec3(0.0f, 1.0f, 0.0f));
-
+    if (mode == OBJECT)
+        retMx = glm::lookAt(glm::vec3(followTarget.x, followTarget.y, followTarget.z), look, glm::vec3(0.0f, 1.0f, 0.0f));
     return retMx;
 }
 

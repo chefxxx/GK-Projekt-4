@@ -60,6 +60,7 @@ public:
 
     /* camera options */
     glm::vec3 followTarget;
+    glm::vec3 look;
 private:
     void updateCameraVectors();
 

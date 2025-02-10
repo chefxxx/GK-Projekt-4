@@ -66,7 +66,7 @@ void myWindow::ProcessInput()
     if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
     {
         flyCamera->mode = OBJECT;
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
 }
 
