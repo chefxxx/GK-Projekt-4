@@ -51,21 +51,25 @@ void myWindow::ProcessInput()
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
     {
         flyCamera->mode = FLY;
+        flyCamera->Zoom = 45;
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
     {
         flyCamera->mode = STATIC;
+        flyCamera->Zoom = 45;
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
     if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
     {
         flyCamera->mode = STATIC_FOLLOW;
+        flyCamera->Zoom = 45;
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
     if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
     {
         flyCamera->mode = OBJECT;
+        flyCamera->Zoom = 60;
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
 }

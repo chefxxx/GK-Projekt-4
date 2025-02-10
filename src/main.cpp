@@ -56,15 +56,12 @@ int main() {
     stbi_set_flip_vertically_on_load(false);
     auto birdModelMtx = glm::mat4(1.0f);
     auto birdStartPos = glm::vec3(12.0f, 5.0f, 0.0f);
+    /* settings for camera following bird */
+    auto cameraPos = glm::vec4(12.0f, 8.0f, 0.0f, 1.0f);
+    cameraPos = cameraPos * glm::rotate(glm::mat4(1.0f), glm::radians(-35.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
     birdModelMtx = glm::translate(birdModelMtx, birdStartPos);
     Model birdModel("../resources/models/low_poly_bird/scene.gltf", birdModelMtx);
-
-    /* bird test */
-    glm::vec4 tmp = glm::vec4(birdStartPos, 1.0f);
-    glm::vec4 tmpStartPos = tmp * glm::rotate(glm::mat4(1.0f), glm::radians(10.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    auto tmpMtx = glm::mat4(1.0f);
-    tmpMtx = glm::translate(tmpMtx, glm::vec3(tmpStartPos.x, tmpStartPos.y, tmpStartPos.z));
-    Model birdTest("../resources/models/low_poly_bird/scene.gltf", tmpMtx);
 
     /* poke_ball */
     stbi_set_flip_vertically_on_load(true);
@@ -96,9 +93,7 @@ int main() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        //TODO: here will be functions that return matrices depending on a camera
-        /* eg. myWindow.GetPerspectiveMatrix
-        *  eg. myWindow.GetViewMatrix        */
+        /* view and projection matrices */
         glm::mat4 projection = glm::perspective(glm::radians(myWindow.flyCamera->Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = myWindow.flyCamera->GetViewMatrix();
 
@@ -119,9 +114,11 @@ int main() {
         /* move bird */
         glm::vec4 tmpBirdPos = glm::vec4(birdStartPos, 1.0f);
         tmpBirdPos = tmpBirdPos * glm::rotate(glm::mat4(1.0f), (float)glfwGetTime() * 0.2f, glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::vec4 tmpCameraPos = cameraPos * glm::rotate(glm::mat4(1.0f), (float)glfwGetTime() * 0.2f, glm::vec3(0.0f, 1.0f, 0.0f));
 
         /* set for follow camera */
         myWindow.flyCamera->followTarget = glm::vec3(tmpBirdPos.x, tmpBirdPos.y, tmpBirdPos.z);
+        myWindow.flyCamera->followCamPos = glm::vec3(tmpCameraPos.x, tmpCameraPos.y, tmpCameraPos.z);
 
         birdModelMtx = glm::mat4(1.0f);
         birdModelMtx = glm::translate(birdModelMtx, glm::vec3(tmpBirdPos.x, tmpBirdPos.y, tmpBirdPos.z));
@@ -134,21 +131,6 @@ int main() {
         testShader.setMat4("projection", projection);
         testShader.setMat4("view", view);
         birdModel.Draw(testShader);
-
-        /* test bird */
-        glm::vec4 tmpTestPos = tmpStartPos;
-        tmpTestPos = tmpTestPos * glm::rotate(glm::mat4(1.0f), (float)glfwGetTime() * 0.2f, glm::vec3(0.0f, 1.0f, 0.0f));
-
-        myWindow.flyCamera->look = glm::vec3(tmpTestPos.x, tmpTestPos.y, tmpTestPos.z);
-
-        tmpMtx = glm::mat4(1.0f);
-        tmpMtx = glm::translate(tmpMtx, glm::vec3(tmpTestPos.x, tmpTestPos.y, tmpTestPos.z));
-        tmpMtx = glm::rotate(tmpMtx, (float)glfwGetTime() * -0.2f, glm::vec3(0.0f, 1.0f, 0.0f));
-        tmpMtx = glm::scale(tmpMtx, glm::vec3(0.2f, 0.2f, 0.2f));
-        birdTest.model = tmpMtx;
-
-        testShader.setMat4("model", birdTest.model);
-        birdTest.Draw(testShader);
 
         /* ball */
         testShader.setMat4("model", ballModel.model);

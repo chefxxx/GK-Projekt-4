@@ -24,7 +24,7 @@ glm::mat4 FlyCamera::GetViewMatrix()
     if (mode == STATIC_FOLLOW)
         retMx = glm::lookAt(STATIC_CAMERA_POSITION, followTarget, glm::vec3(0.0f, 1.0f, 0.0f));
     if (mode == OBJECT)
-        retMx = glm::lookAt(glm::vec3(followTarget.x, followTarget.y, followTarget.z), look, glm::vec3(0.0f, 1.0f, 0.0f));
+        retMx = glm::lookAt(followCamPos, followTarget, glm::vec3(0.0f, 1.0f, 0.0f));
     return retMx;
 }
 
