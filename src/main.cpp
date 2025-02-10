@@ -39,7 +39,7 @@ int main() {
 
     /* shaders, matrices and models */
     Shader testShader("../shaders/test_vert.glsl", "../shaders/test_frag.glsl");
-    Shader lightShader("../shaders/test2_vert.glsl", "../shaders/test2_frag.glsl");
+    Shader lightShader("../shaders/test2_vert.glsl", "../shaders/test3_frag.glsl");
 
     /* forest model */
     auto fModel = glm::mat4(1.0f);
@@ -82,12 +82,17 @@ int main() {
     sokModelMtx = glm::scale(sokModelMtx, glm::vec3(1.5f,1.5f,1.5f));
     Model sokModel("../resources/models/potrait_of_philosopher_sokrates/scene.gltf", sokModelMtx);
 
-    /* lights */
-    LightSource lDir(glm::vec3(0.0f, 20.0f, 0.0f), glm::vec3(1.0f, 1.0f, 0.0f));
+    /* point lights */
     LightSource lPoint1(glm::vec3(10.0, 5.0, 10.0), glm::vec3(1.0, 1.0, 1.0));
     LightSource lPoint2(glm::vec3(-10.0, 5.0, -10.0), glm::vec3(1.0, 1.0, 1.0));
+
+    /* spotlight */
     LightSource lSpotlight(birdStartPos, glm::vec3(1.0, 1.0, 0.0));
     lSpotlight.setDirAndCutoff();
+
+    /* directional light */
+    LightSource lDir(glm::vec3(0.0f, 20.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    lDir.setDirAndCutoff();
 
     // main window loop
     while(!glfwWindowShouldClose(myWindow.window))
@@ -113,16 +118,22 @@ int main() {
         lDir.Draw(testShader, view, projection);
         lSpotlight.Draw(testShader, view, projection);
 
-
+        /* shared variables */
         lightShader.use();
-        lightShader.setVec3("lightColor",  glm::vec3(1.0f, 1.0f, 1.0f));
-        lightShader.setVec3("lightPos", lPoint1.Position);
+        lightShader.setMat4("view", view);
         lightShader.setVec3("viewPos", myWindow.flyCamera->Position);
         lightShader.setMat4("projection", projection);
-        lightShader.setMat4("view", view);
-        lightShader.setFloat("lightConstant", lPoint1.constant);
-        lightShader.setFloat("lightLinear", lPoint1.linear);
-        lightShader.setFloat("lightQuadratic", lPoint1.quadratic);
+
+//        lightShader.setVec3("lightColor",  glm::vec3(1.0f, 1.0f, 1.0f));
+//        lightShader.setVec3("lightPos", lPoint1.Position);
+
+//        lightShader.setFloat("lightConstant", lPoint1.constant);
+//        lightShader.setFloat("lightLinear", lPoint1.linear);
+//        lightShader.setFloat("lightQuadratic", lPoint1.quadratic);
+
+        /* dir light variables */
+        lightShader.setVec3("dirLightDir", lDir.direction);
+        lightShader.setVec3("dirLightColor", lDir.color);
 
         /* set forest shader */
         lightShader.setMat3("normalTrans", glm::mat3(glm::transpose(glm::inverse(forestModel.model))));
@@ -134,22 +145,21 @@ int main() {
         lightShader.setMat4("model", backpackModel.model);
         backpackModel.Draw(lightShader);
 
-        /* move bird */
-        // TODO: bird normals are wrongly translated!!!
+        /* prepare move bird and camera */
         glm::vec4 tmpBirdPos = glm::vec4(birdStartPos, 1.0f);
         tmpBirdPos = tmpBirdPos * glm::rotate(glm::mat4(1.0f), (float)glfwGetTime() * 0.2f, glm::vec3(0.0f, 1.0f, 0.0f));
         glm::vec4 tmpCameraPos = cameraPos * glm::rotate(glm::mat4(1.0f), (float)glfwGetTime() * 0.2f, glm::vec3(0.0f, 1.0f, 0.0f));
 
-        /* set for follow camera */
-        myWindow.flyCamera->followTarget = glm::vec3(tmpBirdPos.x, tmpBirdPos.y, tmpBirdPos.z);
-        myWindow.flyCamera->followCamPos = glm::vec3(tmpCameraPos.x, tmpCameraPos.y, tmpCameraPos.z);
-
+        /* actually move bird*/
         birdModelMtx = glm::mat4(1.0f);
         birdModelMtx = glm::translate(birdModelMtx, glm::vec3(tmpBirdPos.x, tmpBirdPos.y, tmpBirdPos.z));
         birdModelMtx = glm::rotate(birdModelMtx, (float)glfwGetTime() * -0.2f, glm::vec3(0.0f, 1.0f, 0.0f));
         birdModelMtx = glm::scale(birdModelMtx, glm::vec3(0.2f, 0.2f, 0.2f));
-
         birdModel.model = birdModelMtx;
+
+        /* set for follow camera */
+        myWindow.flyCamera->followTarget = glm::vec3(tmpBirdPos.x, tmpBirdPos.y, tmpBirdPos.z);
+        myWindow.flyCamera->followCamPos = glm::vec3(tmpCameraPos.x, tmpCameraPos.y, tmpCameraPos.z);
 
         /* set bird shader */
         lightShader.setMat3("normalTrans", glm::mat3(glm::transpose(glm::inverse(birdModel.model))));

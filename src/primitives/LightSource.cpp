@@ -11,7 +11,7 @@ void LightSource::Draw(Shader shader, glm::mat4 view, glm::mat4 projection)
     shader.setMat4("view", view);
     shader.setMat4("projection", projection);
     auto model = glm::mat4(1.0f);
-    model = glm::translate(model, Position);
+    model = glm::translate(model, position);
     model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
     shader.setMat4("model", model);
     glBindVertexArray(VAO);
@@ -19,8 +19,8 @@ void LightSource::Draw(Shader shader, glm::mat4 view, glm::mat4 projection)
 }
 
 LightSource::LightSource(glm::vec3 pos, glm::vec3 col, float cnst, float lin, float quad) {
-    Position = pos;
-    Color = col;
+    position = pos;
+    color = col;
     constant = cnst;
     linear = lin;
     quadratic = quad;
