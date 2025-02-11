@@ -44,6 +44,9 @@ public:
 
     /* spotlight */
     LightSource *lSpotlight;
+
+    /* perspective */
+    bool ort = false;
 };
 
 

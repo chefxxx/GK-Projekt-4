@@ -24,8 +24,8 @@ enum Camera_Movement {
     RIGHT
 };
 
-const auto STATIC_CAMERA_TARGET   = glm::vec3(6.0f, 6.0f, 6.0f);
-const auto STATIC_CAMERA_POSITION = glm::vec3(15.0f, 15.0f, 15.0f);
+const auto STATIC_CAMERA_TARGET   = glm::vec3(3.0f, 3.0f, 3.0f);
+const auto STATIC_CAMERA_POSITION = glm::vec3(20.0f, 15.0f, 20.0f);
 
 const float YAW         =  -70.0f;
 const float PITCH       =  0.0f;

@@ -1,0 +1,11 @@
+Model Information:
+* title:	Discobolus
+* source:	https://sketchfab.com/3d-models/discobolus-2345c2d09bfd44288d123bb120a1d1e4
+* author:	Bonn Center for Digital Humanities (https://sketchfab.com/bcdh)
+
+Model License:
+* license type:	CC-BY-NC-ND-4.0 (http://creativecommons.org/licenses/by-nc-nd/4.0/)
+* requirements:	Author must be credited. No commercial use. Modified versions can not be distributed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Discobolus" (https://sketchfab.com/3d-models/discobolus-2345c2d09bfd44288d123bb120a1d1e4) by Bonn Center for Digital Humanities (https://sketchfab.com/bcdh) licensed under CC-BY-NC-ND-4.0 (http://creativecommons.org/licenses/by-nc-nd/4.0/)

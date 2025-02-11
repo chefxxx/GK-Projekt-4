@@ -10,6 +10,9 @@ in vec3 Normal;
 in vec3 FragPos;
 
 /* config variables */
+uniform float maxFog;
+uniform float minFog;
+uniform vec3 FogCol;
 uniform bool day;
 
 /* shared variables */
@@ -42,11 +45,19 @@ uniform float p3Lconst;
 uniform float p3Llinear;
 uniform float p3Lquadratic;
 
+/* point4 light */
+uniform vec3 p4Lpos;
+uniform vec3 p4Lcol;
+uniform float p4Lconst;
+uniform float p4Llinear;
+uniform float p4Lquadratic;
+
 /* spotlight */
 uniform vec3 spotPos;
 uniform vec3 spotCol;
 uniform vec3 spotDir;
-uniform float spotCutoff;
+uniform float spotInnerCutoff;
+uniform float spotOuterCutoff;
 
 out vec4 FragColor;
 
@@ -97,12 +108,13 @@ vec3 CalcPointLight(vec3 LightPos, vec3 LightColor,
     return (ambient + diffuse + specular);
 }
 
-vec3 CalcSpotlight(vec3 lightPos, vec3 lightColor, vec3 normal, vec3 fragPos, vec3 viewDir, vec3 lightDirection, float cutOff)
+vec3 CalcSpotlight(vec3 lightPos, vec3 lightColor, vec3 normal, vec3 fragPos, vec3 viewDir, vec3 lightDirection)
 {
     vec3 lightDir = normalize(lightPos - fragPos);
     float theta = dot(lightDir, normalize(-lightDirection));
 
-    if(theta > cutOff)
+
+    if(theta > spotOuterCutoff)
     {
         float diff = max(dot(normal, lightDir), 0.0);
 
@@ -112,6 +124,12 @@ vec3 CalcSpotlight(vec3 lightPos, vec3 lightColor, vec3 normal, vec3 fragPos, ve
         vec3 ambient  = lightColor * vec3(texture(texture_diffuse1, TexCoords)) * AMBIENT_STRENGTH;
         vec3 diffuse  = lightColor  * diff * vec3(texture(texture_diffuse1, TexCoords));
         vec3 specular = lightColor * spec * vec3(texture(texture_specular1, TexCoords)) * SPECULAR_STRENGTH;
+
+        float epsilon   = spotInnerCutoff - spotOuterCutoff;
+        float intensity = clamp((theta - spotOuterCutoff) / epsilon, 0.0, 1.0);
+
+        diffuse  *= intensity;
+        specular *= intensity;
 
         return (ambient + diffuse + specular);
     }
@@ -136,9 +154,17 @@ void main()
     result += CalcPointLight(p1Lpos, p1Lcol, p1Lconst, p1Llinear, p1Lquadratic, norm, FragPos, viewDir);
     result += CalcPointLight(p2Lpos, p2Lcol, p2Lconst, p2Llinear, p2Lquadratic, norm, FragPos, viewDir);
     result += CalcPointLight(p3Lpos, p3Lcol, p3Lconst, p3Llinear, p3Lquadratic, norm, FragPos, viewDir);
+    result += CalcPointLight(p4Lpos, p4Lcol, p4Lconst, p4Llinear, p4Lquadratic, norm, FragPos, viewDir);
+
 
     /* spotlight */
-    result += CalcSpotlight(spotPos, spotCol, norm, FragPos, viewDir, spotDir, spotCutoff);
+    result += CalcSpotlight(spotPos, spotCol, norm, FragPos, viewDir, spotDir);
+
+    float dist = length(FragPos - viewPos);
+    float fog_factor = (maxFog - dist) / (maxFog - minFog);
+    fog_factor = clamp(fog_factor, 0.0, 1.0);
+
+    result = mix(FogCol, result, fog_factor);
 
     FragColor = vec4(result, 1.0f);
 }

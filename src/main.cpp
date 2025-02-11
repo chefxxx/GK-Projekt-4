@@ -5,6 +5,11 @@
 #include "primitives/Model.h"
 #include "primitives/LightSource.h"
 
+#define FOG_COL_DAY glm::vec3(0.7f, 0.7f, 0.7f)
+#define FOG_COL_NIG glm::vec3(0.1f, 0.1f, 0.1f)
+#define MAX_FOG 40.0f
+#define MIN_FOG 20.0f
+
 int main() {
 
     glfwInit();
@@ -51,7 +56,7 @@ int main() {
     stbi_set_flip_vertically_on_load(true);
     auto bModel = glm::mat4(1.0f);
     bModel = glm::translate(bModel, glm::vec3(0.0f, 1.0f, 0.0f));
-    bModel = glm::scale(bModel, glm::vec3(0.25f, 0.25f, 0.25f));
+    bModel = glm::scale(bModel, glm::vec3(0.5f, 0.5f, 0.5f));
     Model backpackModel("../resources/models/backpack/backpack.obj", bModel);
 
     /* bird */
@@ -70,33 +75,43 @@ int main() {
     auto ballModelMtx = glm::mat4(1.0f);
     auto ballStartPos = glm::vec3(-3.0f, 1.0f, 0.0f);
     ballModelMtx = glm::translate(ballModelMtx, ballStartPos);
-    ballModelMtx = glm::scale(ballModelMtx, glm::vec3(0.5f, 0.5f, 0.5f));
+    ballModelMtx = glm::scale(ballModelMtx, glm::vec3(0.75f, 0.75f, 0.75f));
     Model ballModel("../resources/models/soccer_ball/scene.gltf", ballModelMtx);
 
     /* sokrates */
     stbi_set_flip_vertically_on_load(false);
     auto sokModelMtx = glm::mat4(1.0f);
-    auto sokStartPos = glm::vec3(3.0f, 1.0f, 0.0f);
-    sokModelMtx = glm::translate(sokModelMtx, sokStartPos);
+    sokModelMtx = glm::translate(sokModelMtx, glm::vec3(3.0f, 1.0f, 0.0f));
     sokModelMtx = glm::rotate(sokModelMtx, glm::radians(-90.0f), glm::vec3(1.0f,0.0f,0.0f));
-    sokModelMtx = glm::scale(sokModelMtx, glm::vec3(1.5f,1.5f,1.5f));
+    sokModelMtx = glm::scale(sokModelMtx, glm::vec3(2.5f,2.5f,2.5f));
     Model sokModel("../resources/models/potrait_of_philosopher_sokrates/scene.gltf", sokModelMtx);
+
+    /* discobolus */
+    auto discModelMtx = glm::mat4(1.0f);
+    discModelMtx = glm::translate(discModelMtx, glm::vec3(6.0f, 0.0f, 5.0f));
+    discModelMtx = glm::rotate(discModelMtx, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    discModelMtx = glm::rotate(discModelMtx, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    discModelMtx = glm::scale(discModelMtx, glm::vec3(2.5f, 2.5f, 2.5f));
+    Model discModel("../resources/models/discobolus/scene.gltf", discModelMtx);
 
     /* point lights */
     LightSource lPoint1(glm::vec3(10.0, 5.0, 10.0), glm::vec3(1.0, 1.0, 1.0));
     lPoint1.setPoints(0.14f, 0.07f);
-
     LightSource lPoint2(glm::vec3(-8.0, 5.0, -8.0), glm::vec3(1.0, 1.0, 1.0));
     lPoint2.setPoints(0.07f, 0.017f);
-
     LightSource lPoint3(glm::vec3(0.0f, 1.0f, 3.0f), glm::vec3(1.0, 1.0, 1.0));
+    LightSource lPoint4(glm::vec3(5.0f, 1.0f, 1.0f), glm::vec3(1.0, 1.0, 1.0));
 
+    /* spotlight */
     myWindow.lSpotlight = new LightSource (birdStartPos, glm::vec3(1.0, 1.0, 1.0));
-    myWindow.lSpotlight->setDirAndCutoff(glm::vec3(0.0f, -1.0f, 0.0f), 30.0f);
+    myWindow.lSpotlight->setDirAndCutoffs(glm::vec3(0.0f, -1.0f, 0.0f), 20.0f, 25.0f);
 
     /* directional light */
     LightSource lDir(glm::vec3(0.0f, 20.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
-    lDir.setDirAndCutoff();
+    lDir.setDir();
+
+    /* fog */
+    glm::vec3 fogCol = FOG_COL_DAY;
 
     // main window loop
     while(!glfwWindowShouldClose(myWindow.window))
@@ -109,10 +124,12 @@ int main() {
 
         // rendering commands here
         // ...
+
         if(myWindow.day)
-            glClearColor(0.9f, 0.9f, 0.9f, 0.9f);
+            fogCol = FOG_COL_DAY;
         else
-            glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+            fogCol = FOG_COL_NIG;
+        glClearColor(fogCol.x, fogCol.y ,fogCol.z, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         /* view and projection matrices */
@@ -120,9 +137,7 @@ int main() {
         glm::mat4 view = myWindow.flyCamera->GetViewMatrix();
 
         /* prepare move bird, camera and spotlight */
-        auto tmpAxesSpotlight =  glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
         glm::vec4 tmpBirdPos = glm::vec4(birdStartPos, 1.0f);
-        tmpAxesSpotlight = tmpAxesSpotlight * glm::rotate(glm::mat4(1.0f), (float)glfwGetTime() * -0.2f, glm::vec3(0.0f, 1.0f, 0.0f));
         tmpBirdPos = tmpBirdPos * glm::rotate(glm::mat4(1.0f), (float)glfwGetTime() * 0.2f, glm::vec3(0.0f, 1.0f, 0.0f));
         glm::vec4 tmpCameraPos = cameraPos * glm::rotate(glm::mat4(1.0f), (float)glfwGetTime() * 0.2f, glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -139,16 +154,20 @@ int main() {
 
         /* spotlight movement */
         myWindow.lSpotlight->position = myWindow.flyCamera->followTarget;
-        myWindow.lSpotlight->tmpAxes = tmpAxesSpotlight;
+        glm::vec4 tmpDirS = glm::vec4(myWindow.lSpotlight->direction, 1.0f) * glm::rotate(glm::mat4(1.0f), (float)glfwGetTime() * 0.2f, glm::vec3(0.0f, 1.0f, 0.0f));
 
         /* draw lights first */
         lPoint1.Draw(testShader, view, projection);
         lPoint2.Draw(testShader, view, projection);
         lPoint3.Draw(testShader, view, projection);
+        lPoint4.Draw(testShader, view, projection);
 
         /* shared variables */
         lightShader.use();
         lightShader.setBool("day", myWindow.day);
+        lightShader.setVec3("FogCol", fogCol);
+        lightShader.setFloat("maxFog", MAX_FOG);
+        lightShader.setFloat("minFog", MIN_FOG);
         lightShader.setMat4("view", view);
         lightShader.setVec3("viewPos", myWindow.flyCamera->Position);
         lightShader.setMat4("projection", projection);
@@ -160,8 +179,9 @@ int main() {
         /* spotlight */
         lightShader.setVec3("spotPos", myWindow.lSpotlight->position);
         lightShader.setVec3("spotCol", myWindow.lSpotlight->color);
-        lightShader.setVec3("spotDir", myWindow.lSpotlight->direction);
-        lightShader.setFloat("spotCutoff", myWindow.lSpotlight->GetCutOff());
+        lightShader.setVec3("spotDir", glm::vec3(tmpDirS.x, tmpDirS.y, tmpDirS.z));
+        lightShader.setFloat("spotInnerCutoff", myWindow.lSpotlight->GetInnerCutOff());
+        lightShader.setFloat("spotOuterCutoff", myWindow.lSpotlight->GetOuterCutOff());
 
         /* p1 light variables */
         lightShader.setVec3("p1Lpos", lPoint1.position);
@@ -183,6 +203,13 @@ int main() {
         lightShader.setFloat("p3Lconst", lPoint3.constant);
         lightShader.setFloat("p3Llinear", lPoint3.linear);
         lightShader.setFloat("p3Lquadratic", lPoint3.quadratic);
+
+        /* p4 light variables */
+        lightShader.setVec3("p4Lpos", lPoint4.position);
+        lightShader.setVec3("p4Lcol", lPoint4.color);
+        lightShader.setFloat("p4Lconst", lPoint4.constant);
+        lightShader.setFloat("p4Llinear", lPoint4.linear);
+        lightShader.setFloat("p4Lquadratic", lPoint4.quadratic);
 
         /* set forest shader */
         lightShader.setMat3("normalTrans", glm::mat3(glm::transpose(glm::inverse(forestModel.model))));
@@ -208,6 +235,11 @@ int main() {
         lightShader.setMat3("normalTrans", glm::mat3(glm::transpose(glm::inverse(sokModel.model))));
         lightShader.setMat4("model", sokModel.model);
         sokModel.Draw(lightShader);
+
+        /* discobolus */
+        lightShader.setMat3("normalTrans", glm::mat3(glm::transpose(glm::inverse(discModel.model))));
+        lightShader.setMat4("model", discModel.model);
+        discModel.Draw(lightShader);
 
         // check and call events, swap buffers
         glfwSwapBuffers(myWindow.window);

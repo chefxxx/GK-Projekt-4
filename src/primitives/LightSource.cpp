@@ -35,11 +35,6 @@ LightSource::LightSource(glm::vec3 pos, glm::vec3 col, float cnst, float lin, fl
     glEnableVertexAttribArray(0);
 }
 
-void LightSource::setDirAndCutoff(glm::vec3 dir, float value)
-{
-    direction = dir;
-    cutoff = value;
-}
 
 void LightSource::setPoints(float lin, float quad)
 {
@@ -53,24 +48,41 @@ void LightSource::ProcessDirection(LightMovement dir, float time)
     auto tmp = glm::vec4(direction, 1.0f);
     if (dir == U)
     {
-        tmp = tmp * glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(tmpAxes.x, 0.0f, 0.0f));
+        tmp = tmp * glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(1.0f, 0.0f, 0.0f));
     }
     if (dir == D)
     {
-        tmp = tmp * glm::rotate(glm::mat4(1.0f), glm::radians(-angle), glm::vec3(tmpAxes.x, 0.0f, 0.0f));
+        tmp = tmp * glm::rotate(glm::mat4(1.0f), glm::radians(-angle), glm::vec3(1.0f, 0.0f, 0.0f));
     }
     if (dir == R)
     {
-        tmp = tmp * glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0.0f, 0.0f, tmpAxes.z));
+        tmp = tmp * glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
     }
     if (dir == L)
     {
-        tmp = tmp * glm::rotate(glm::mat4(1.0f), glm::radians(-angle), glm::vec3(0.0f, 0.0f, tmpAxes.z));
+        tmp = tmp * glm::rotate(glm::mat4(1.0f), glm::radians(-angle), glm::vec3(0.0f, 0.0f, 1.0f));
     }
     direction = glm::normalize(glm::vec3(tmp));
 }
 
-float LightSource::GetCutOff()
+float LightSource::GetOuterCutOff()
 {
-    return glm::cos(glm::radians(cutoff));
+    return glm::cos(glm::radians(outerCutoff));
+}
+
+float LightSource::GetInnerCutOff()
+{
+    return glm::cos(glm::radians(innerCutoff));
+}
+
+void LightSource::setDirAndCutoffs(glm::vec3 dir, float value1, float value2)
+{
+    direction = dir;
+    innerCutoff = value1;
+    outerCutoff = value2;
+}
+
+void LightSource::setDir(glm::vec3 dir)
+{
+    direction = dir;
 }
