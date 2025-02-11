@@ -84,6 +84,14 @@ void myWindow::ProcessInput()
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         flyCamera->ProcessKeyboard(RIGHT, deltaTime);
 
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+        lSpotlight->ProcessDirection(U, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+        lSpotlight->ProcessDirection(D, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+        lSpotlight->ProcessDirection(R, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+        lSpotlight->ProcessDirection(L, deltaTime);
 }
 
 void myWindow::framebuffer_size_callback(GLFWwindow *window, int width, int height)
@@ -124,3 +132,4 @@ void myWindow::calculateFrameTime()
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 }
+

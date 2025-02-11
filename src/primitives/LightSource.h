@@ -10,6 +10,14 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "Shader.h"
 
+enum LightMovement
+{
+    U,
+    D,
+    L,
+    R,
+};
+
 const float VERTS[] = {
         -0.5f, -0.5f, -0.5f,
         0.5f, -0.5f, -0.5f,
@@ -73,6 +81,8 @@ public:
 
     void setDirAndCutoff(glm::vec3 dir = glm::vec3(0.0f, -1.0f, 0.0f), float value = 12.5f);
     void setPoints(float lin, float quad);
+    void ProcessDirection(LightMovement direction, float time);
+    float GetCutOff();
 };
 
 

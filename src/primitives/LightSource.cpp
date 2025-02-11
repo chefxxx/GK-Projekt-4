@@ -4,7 +4,6 @@
 
 #include "LightSource.h"
 
-
 void LightSource::Draw(Shader shader, glm::mat4 view, glm::mat4 projection)
 {
     shader.use();
@@ -46,4 +45,14 @@ void LightSource::setPoints(float lin, float quad)
 {
     linear = lin;
     quadratic = quad;
+}
+
+void LightSource::ProcessDirection(LightMovement direction, float time)
+{
+
+}
+
+float LightSource::GetCutOff()
+{
+    return glm::cos(glm::radians(cutoff));
 }

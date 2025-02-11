@@ -6,9 +6,10 @@
 #define GK_FINAL_0_MYWINDOW_H
 
 #include <iostream>
-#include "FlyCamera.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include "FlyCamera.h"
+#include "LightSource.h"
 
 const unsigned int SCR_WIDTH = 1200;
 const unsigned int SCR_HEIGHT = 1000;
@@ -40,6 +41,9 @@ public:
 
     /* scene variables */
     bool day = true;
+
+    /* spotlight */
+    LightSource *lSpotlight;
 };
 
 

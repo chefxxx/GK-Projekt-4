@@ -42,6 +42,12 @@ uniform float p3Lconst;
 uniform float p3Llinear;
 uniform float p3Lquadratic;
 
+/* spotlight */
+uniform vec3 spotPos;
+uniform vec3 spotCol;
+uniform vec3 spotDir;
+uniform float spotCutoff;
+
 out vec4 FragColor;
 
 vec3 CalcDirLight(vec3 dirLightDir, vec3 lightColor, vec3 normal, vec3 viewDir)
@@ -91,6 +97,28 @@ vec3 CalcPointLight(vec3 LightPos, vec3 LightColor,
     return (ambient + diffuse + specular);
 }
 
+vec3 CalcSpotlight(vec3 lightPos, vec3 lightColor, vec3 normal, vec3 fragPos, vec3 viewDir, vec3 lightDirection, float cutOff)
+{
+    vec3 lightDir = normalize(lightPos - fragPos);
+    float theta = dot(lightDir, normalize(-lightDirection));
+
+    if(theta > cutOff)
+    {
+        float diff = max(dot(normal, lightDir), 0.0);
+
+        vec3 reflectDir = reflect(-lightDir, normal);
+        float spec = pow(max(dot(viewDir, reflectDir), 0.0), MATERIAL_SHINESS);
+
+        vec3 ambient  = lightColor * vec3(texture(texture_diffuse1, TexCoords)) * AMBIENT_STRENGTH;
+        vec3 diffuse  = lightColor  * diff * vec3(texture(texture_diffuse1, TexCoords));
+        vec3 specular = lightColor * spec * vec3(texture(texture_specular1, TexCoords)) * SPECULAR_STRENGTH;
+
+        return (ambient + diffuse + specular);
+    }
+
+    return vec3(0.0f);
+}
+
 void main()
 {
     /* shared variables */
@@ -108,6 +136,9 @@ void main()
     result += CalcPointLight(p1Lpos, p1Lcol, p1Lconst, p1Llinear, p1Lquadratic, norm, FragPos, viewDir);
     result += CalcPointLight(p2Lpos, p2Lcol, p2Lconst, p2Llinear, p2Lquadratic, norm, FragPos, viewDir);
     result += CalcPointLight(p3Lpos, p3Lcol, p3Lconst, p3Llinear, p3Lquadratic, norm, FragPos, viewDir);
+
+    /* spotlight */
+    result += CalcSpotlight(spotPos, spotCol, norm, FragPos, viewDir, spotDir, spotCutoff);
 
     FragColor = vec4(result, 1.0f);
 }
