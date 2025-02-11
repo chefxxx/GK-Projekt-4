@@ -41,12 +41,10 @@ public:
 
     /* scene variables */
     bool day = true;
+    bool deferredShading = false;
 
     /* spotlight */
     LightSource *lSpotlight;
-
-    /* perspective */
-    bool ort = false;
 };
 
 
