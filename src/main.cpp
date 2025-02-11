@@ -119,8 +119,10 @@ int main() {
         glm::mat4 projection = glm::perspective(glm::radians(myWindow.flyCamera->Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = myWindow.flyCamera->GetViewMatrix();
 
-        /* prepare move bird and camera */
+        /* prepare move bird, camera and spotlight */
+        auto tmpAxesSpotlight =  glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
         glm::vec4 tmpBirdPos = glm::vec4(birdStartPos, 1.0f);
+        tmpAxesSpotlight = tmpAxesSpotlight * glm::rotate(glm::mat4(1.0f), (float)glfwGetTime() * -0.2f, glm::vec3(0.0f, 1.0f, 0.0f));
         tmpBirdPos = tmpBirdPos * glm::rotate(glm::mat4(1.0f), (float)glfwGetTime() * 0.2f, glm::vec3(0.0f, 1.0f, 0.0f));
         glm::vec4 tmpCameraPos = cameraPos * glm::rotate(glm::mat4(1.0f), (float)glfwGetTime() * 0.2f, glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -136,7 +138,8 @@ int main() {
         myWindow.flyCamera->followCamPos = glm::vec3(tmpCameraPos.x, tmpCameraPos.y, tmpCameraPos.z);
 
         /* spotlight movement */
-        //myWindow.lSpotlight->position = myWindow.flyCamera->followTarget;
+        myWindow.lSpotlight->position = myWindow.flyCamera->followTarget;
+        myWindow.lSpotlight->tmpAxes = tmpAxesSpotlight;
 
         /* draw lights first */
         lPoint1.Draw(testShader, view, projection);

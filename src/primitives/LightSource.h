@@ -18,6 +18,8 @@ enum LightMovement
     R,
 };
 
+const float MovSpeed = 7.5f;
+
 const float VERTS[] = {
         -0.5f, -0.5f, -0.5f,
         0.5f, -0.5f, -0.5f,
@@ -64,6 +66,7 @@ const float VERTS[] = {
 
 class LightSource {
 public:
+    glm::vec3 prevPosition;
     glm::vec3 position;
     glm::vec3 color;
     unsigned int VAO;
@@ -74,14 +77,16 @@ public:
     float quadratic;
 
     glm::vec3  direction;
+
     float cutoff;
+    glm::vec3 tmpAxes;
 
     LightSource(glm::vec3 pos, glm::vec3 col, float cnst = 1.0f, float lin = 0.09f, float quad = 0.032f);
     void Draw(Shader shader, glm::mat4 view, glm::mat4 projection);
 
     void setDirAndCutoff(glm::vec3 dir = glm::vec3(0.0f, -1.0f, 0.0f), float value = 12.5f);
     void setPoints(float lin, float quad);
-    void ProcessDirection(LightMovement direction, float time);
+    void ProcessDirection(LightMovement dir, float time);
     float GetCutOff();
 };
 

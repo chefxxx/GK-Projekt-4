@@ -47,9 +47,27 @@ void LightSource::setPoints(float lin, float quad)
     quadratic = quad;
 }
 
-void LightSource::ProcessDirection(LightMovement direction, float time)
+void LightSource::ProcessDirection(LightMovement dir, float time)
 {
-
+    float angle = MovSpeed * time;
+    auto tmp = glm::vec4(direction, 1.0f);
+    if (dir == U)
+    {
+        tmp = tmp * glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(tmpAxes.x, 0.0f, 0.0f));
+    }
+    if (dir == D)
+    {
+        tmp = tmp * glm::rotate(glm::mat4(1.0f), glm::radians(-angle), glm::vec3(tmpAxes.x, 0.0f, 0.0f));
+    }
+    if (dir == R)
+    {
+        tmp = tmp * glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0.0f, 0.0f, tmpAxes.z));
+    }
+    if (dir == L)
+    {
+        tmp = tmp * glm::rotate(glm::mat4(1.0f), glm::radians(-angle), glm::vec3(0.0f, 0.0f, tmpAxes.z));
+    }
+    direction = glm::normalize(glm::vec3(tmp));
 }
 
 float LightSource::GetCutOff()
