@@ -45,6 +45,10 @@ public:
 
     /* spotlight */
     LightSource *lSpotlight;
+
+    /* ortho */
+    bool ortho = false;
+    float orthoScale = 3.0f;
 };
 
 

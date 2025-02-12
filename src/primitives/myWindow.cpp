@@ -46,6 +46,8 @@ void myWindow::key_callback(GLFWwindow *window, int key, int scancode, int actio
         this->day = !this->day;
     if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
         this->deferredShading =! this->deferredShading;
+    if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS)
+        this->ortho =! this->ortho;
 
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
     {

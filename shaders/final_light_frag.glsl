@@ -9,16 +9,16 @@ in vec2 TexCoords;
 in vec3 Normal;
 in vec3 FragPos;
 
+/* shared variables */
+uniform sampler2D texture_diffuse1;
+uniform sampler2D texture_specular1;
+uniform vec3 viewPos;
+
 /* config variables */
 uniform float maxFog;
 uniform float minFog;
 uniform vec3 FogCol;
 uniform bool day;
-
-/* shared variables */
-uniform sampler2D texture_diffuse1;
-uniform sampler2D texture_specular1;
-uniform vec3 viewPos;
 
 /* directional light variables */
 uniform vec3 dirLightDir;

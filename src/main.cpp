@@ -11,11 +11,12 @@
 #define MAX_FOG 40.0f
 #define MIN_FOG 20.0f
 
+void renderQuad();
 void prepareGBuff(unsigned int *gPosition, unsigned int *gNormal, unsigned int *gAlbedoSpec, unsigned int *gBuffer);
 void drawModels(std::vector<Model>* models, Shader* shader);
 void prepareLightShader(Shader *lightShader, myWindow *myWindow, glm::vec3 fogCol,
                         LightSource lPoint1, LightSource lPoint2, LightSource lPoint3, LightSource lPoint4,
-                        LightSource lDir, glm::mat4 view, glm::mat4 projection, glm::vec4 tmpDirS);
+                        LightSource lDir, glm::vec4 tmpDirS);
 int main() {
 
     glfwInit();
@@ -50,7 +51,7 @@ int main() {
 
     /* shaders, matrices and models */
     Shader testShader("../shaders/test_vert.glsl", "../shaders/test_frag.glsl");
-    Shader lightShader("../shaders/test2_vert.glsl", "../shaders/test3_frag.glsl");
+    Shader lightShader("../shaders/final_light_vert.glsl", "../shaders/final_light_frag.glsl");
 
     std::vector<Model> models;
 
@@ -132,8 +133,8 @@ int main() {
     prepareGBuff(&gPosition, &gNormal, &gAlbedoSpec, &gBuffer);
 
     // shader configuration
-    Shader lightningPassShader("","");
-    Shader geometryPassShader("","");
+    Shader lightningPassShader("../shaders/lig_deferred_vert.glsl","../shaders/lig_deferred_frag.glsl");
+    Shader geometryPassShader("../shaders/final_light_vert.glsl","../shaders/geo_deferred_frag.glsl");
     
     lightningPassShader.use();
     lightningPassShader.setInt("gPosition", 0);
@@ -161,8 +162,23 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         /* view and projection matrices */
-        glm::mat4 projection = glm::perspective(glm::radians(myWindow.flyCamera->Zoom),
-                                                (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 projection;
+
+        if (myWindow.ortho)
+        {
+            float aspect = (float) SCR_WIDTH / (float) SCR_HEIGHT;
+            float left   =  -myWindow.orthoScale * aspect;
+            float right  =  myWindow.orthoScale * aspect;
+            float bottom =  -myWindow.orthoScale;
+            float top    =  myWindow.orthoScale;
+            projection =  glm::ortho(left, right, bottom, top, 0.1f, 100.0f);
+        }
+        else
+        {
+            projection = glm::perspective(glm::radians(myWindow.flyCamera->Zoom),
+                                          (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f, 100.0f);
+        }
+
         glm::mat4 view = myWindow.flyCamera->GetViewMatrix();
 
         /* prepare move bird, camera and spotlight */
@@ -190,7 +206,28 @@ int main() {
 
         if (myWindow.deferredShading)
         {
+            /* geometry pass */
+            glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            geometryPassShader.use();
+            geometryPassShader.setMat4("view", view);
+            geometryPassShader.setMat4("projection", projection);
+            drawModels(&models, &geometryPassShader);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+            /* lightning pass */
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            lightningPassShader.use();
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, gPosition);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, gNormal);
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
+            prepareLightShader(&lightningPassShader, &myWindow, fogCol, lPoint1, lPoint2, lPoint3, lPoint4,
+                               lDir, tmpDirS);
+            lightningPassShader.setVec3("viewPos", myWindow.flyCamera->Position);
+            renderQuad();
         }
         else
         {
@@ -200,8 +237,12 @@ int main() {
             lPoint3.Draw(testShader, view, projection);
             lPoint4.Draw(testShader, view, projection);
 
+            lightShader.use();
+            lightShader.setMat4("view", view);
+            lightShader.setMat4("projection", projection);
+
             prepareLightShader(&lightShader, &myWindow, fogCol, lPoint1, lPoint2, lPoint3, lPoint4,
-                               lDir, view, projection, tmpDirS);
+                               lDir, tmpDirS);
 
             drawModels(&models, &lightShader);
         }
@@ -216,7 +257,7 @@ int main() {
 
 void prepareLightShader(Shader *lightShader, myWindow *myWindow, glm::vec3 fogCol,
                         LightSource lPoint1, LightSource lPoint2, LightSource lPoint3, LightSource lPoint4,
-                        LightSource lDir, glm::mat4 view, glm::mat4 projection, glm::vec4 tmpDirS)
+                        LightSource lDir, glm::vec4 tmpDirS)
 {
     /* shared variables */
     lightShader->use();
@@ -224,9 +265,7 @@ void prepareLightShader(Shader *lightShader, myWindow *myWindow, glm::vec3 fogCo
     lightShader->setVec3("FogCol", fogCol);
     lightShader->setFloat("maxFog", MAX_FOG);
     lightShader->setFloat("minFog", MIN_FOG);
-    lightShader->setMat4("view", view);
     lightShader->setVec3("viewPos", myWindow->flyCamera->Position);
-    lightShader->setMat4("projection", projection);
 
     /* dir light variables */
     lightShader->setVec3("dirLightDir", lDir.direction);
@@ -316,4 +355,33 @@ void prepareGBuff(unsigned int *gPosition, unsigned int *gNormal, unsigned int *
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cout << "Framebuffer not complete!" << std::endl;
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+unsigned int quadVAO = 0;
+unsigned int quadVBO;
+void renderQuad()
+{
+    if (quadVAO == 0)
+    {
+        float quadVertices[] = {
+                // positions        // texture Coords
+                -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+                -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+                1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+                1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+        };
+        // setup plane VAO
+        glGenVertexArrays(1, &quadVAO);
+        glGenBuffers(1, &quadVBO);
+        glBindVertexArray(quadVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    }
+    glBindVertexArray(quadVAO);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
 }
