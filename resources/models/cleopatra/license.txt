@@ -1,0 +1,11 @@
+Model Information:
+* title:	Cleópatra
+* source:	https://sketchfab.com/3d-models/cleopatra-941fc6fe136745d0b8d7a0c198a74b37
+* author:	Artur Coelho (https://sketchfab.com/coelhoelectrico)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Cleópatra" (https://sketchfab.com/3d-models/cleopatra-941fc6fe136745d0b8d7a0c198a74b37) by Artur Coelho (https://sketchfab.com/coelhoelectrico) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

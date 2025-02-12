@@ -109,6 +109,13 @@ int main() {
     Model discModel("../resources/models/discobolus/scene.gltf", &discModelMtx);
     models.push_back(discModel);
 
+    /* cleopatra */
+    auto cleoMtx = glm::mat4(1.0f);
+    cleoMtx = glm::translate(cleoMtx, glm::vec3(7.5f, 0.0f, 0.0f));
+    cleoMtx = glm::scale(cleoMtx, glm::vec3(1.5f, 1.5f, 1.5f));
+    Model cleoModel("../resources/models/cleopatra/scene.gltf", &cleoMtx);
+    models.push_back(cleoModel);
+
     /* point lights */
     LightSource lPoint1(glm::vec3(10.0, 5.0, 10.0), glm::vec3(1.0, 1.0, 1.0));
     lPoint1.setPoints(0.14f, 0.07f);
@@ -226,7 +233,6 @@ int main() {
             glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
             prepareLightShader(&lightningPassShader, &myWindow, fogCol, lPoint1, lPoint2, lPoint3, lPoint4,
                                lDir, tmpDirS);
-            lightningPassShader.setVec3("viewPos", myWindow.flyCamera->Position);
             renderQuad();
         }
         else
@@ -364,7 +370,6 @@ void renderQuad()
     if (quadVAO == 0)
     {
         float quadVertices[] = {
-                // positions        // texture Coords
                 -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
                 -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
                 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
