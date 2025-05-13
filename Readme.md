@@ -14,3 +14,7 @@ This guide describes the key mappings and functionalities available in the appli
 | `N`                | Toggle **Night/Day Mode**                    |
 | `B`                | Toggle **Orthogonal/Perspective Projection Matrix** |
 | Arrow Keys (`↑↓←→`) | **Move Reflector**                          |
+
+[!Photo1](./s1.png)
+[!Photo2](./s2.png)
+[!Photo3](./s3.png)
